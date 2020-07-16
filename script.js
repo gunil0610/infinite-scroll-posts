@@ -1,35 +1,37 @@
 const postContainer = document.getElementById("post-container"),
   loading = document.querySelector(".loader"),
-  filter = document.getElementById("filter");
+  filter = document.getElementById("filter"),
+  popular = document.getElementById("popular"),
+  latest = document.getElementById("latest");
 
-let limit = 5;
-let page = 1;
+let page = 0;
+// show = search for popular , show = search_by_date for latest
+let show = "search";
 
-// Fetch posts from API
-async function getPosts() {
+// Fetch posts from HN API
+async function getPost() {
   const res = await fetch(
-    `https://jsonplaceholder.typicode.com/posts?_limit=${limit}&_page=${page}`
+    `http://hn.algolia.com/api/v1/${show}?tags=story&page=${page}`
   );
 
   const data = await res.json();
-
   return data;
 }
 
-// Show posts in DOM
+// Show HN posts in DOM
 async function showPosts() {
-  const posts = await getPosts();
+  const HNPosts = await getPost();
 
-  posts.forEach((post) => {
+  HNPosts.hits.forEach((post) => {
     const postEl = document.createElement("div");
     postEl.classList.add("post");
     postEl.innerHTML = `
-        <div class="number">${post.id}</div>
-        <div class="post-info">
-            <h2 class="post-title">${post.title}</h2>
-            <p class="post-body">${post.body}</p>
-        </div>
-      `;
+      <div class="number">${post.points}</div>
+      <div class="post-info">
+        <h2 class="post-title">${post.title}</h2>
+        <p class="post-body">${post.url}</p>
+      </div>
+    `;
 
     postContainer.appendChild(postEl);
   });
@@ -66,15 +68,38 @@ function filterPosts(e) {
   });
 }
 
+// Handle Click
+function handleClick(e) {
+  const clicked = e.target.id;
+  if (clicked === "popular") {
+    show = "search";
+    if (!popular.classList.contains("chosen")) {
+      popular.classList.add("chosen");
+      latest.classList.remove("chosen");
+    }
+  } else {
+    show = "search_by_date";
+    if (!latest.classList.contains("chosen")) {
+      latest.classList.add("chosen");
+      popular.classList.remove("chosen");
+    }
+  }
+  postContainer.innerHTML = "";
+  HNpage = 0;
+  showPosts();
+}
+
 // Show initial posts
 showPosts();
 
 window.addEventListener("scroll", () => {
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
-  if (scrollTop + clientHeight >= scrollHeight - 5) {
+  if (scrollTop + clientHeight >= scrollHeight - 1) {
     showLoading();
   }
 });
 
 filter.addEventListener("input", filterPosts);
+popular.addEventListener("click", handleClick);
+latest.addEventListener("click", handleClick);

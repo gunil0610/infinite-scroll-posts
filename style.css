@@ -22,6 +22,17 @@ h1 {
   text-align: center;
 }
 
+.showby {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.showby .chosen {
+  text-transform: uppercase;
+  text-decoration: underline;
+}
+
 .filter-container {
   margin-top: 20px;
   width: 80vw;
