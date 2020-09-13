@@ -11,7 +11,7 @@ let show = "search";
 // Fetch posts from HN API
 async function getPost() {
   const res = await fetch(
-    `http://hn.algolia.com/api/v1/${show}?tags=story&page=${page}`
+    `https://hn.algolia.com/api/v1/${show}?tags=story&page=${page}`
   );
 
   const data = await res.json();
